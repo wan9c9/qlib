@@ -106,7 +106,7 @@ This table demonstrates the supported Python version of `Qlib`:
 | Python 3.9    | :x:                   | :heavy_check_mark:   | :x: |
 
 **Note**: 
-1. **Conda** is suggested for managing your Python environment.
+1. **Conda** is suggested for managing your Python environment. There could be dependency conflict with your current environments. If this is the case, it's best to create a new environment for qlib.
 1. Please pay attention that installing cython in Python 3.6 will raise some error when installing ``Qlib`` from source. If users use Python 3.6 on their machines, it is recommended to *upgrade* Python to version 3.7 or use `conda`'s Python to install ``Qlib`` from source.
 1. For Python 3.9, `Qlib` supports running workflows such as training models, doing backtest and plot most of the related figures (those included in [notebook](examples/workflow_by_code.ipynb)). However, plotting for the *model performance* is not supported for now and we will fix this when the dependent packages are upgraded in the future.
 
