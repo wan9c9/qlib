@@ -125,7 +125,7 @@ Users can also provide their own data in CSV format. However, the CSV data **mus
 
 - CSV file is named after a specific stock *or* the CSV file includes a column of the stock name
 
-    - Name the CSV file after a stock: `SH600000.csv`, `AAPL.csv` (not case sensitive).
+    - Name the CSV file after a stock, e.g., `SH600000.csv`, `AAPL.csv` (not case sensitive).
     
     - CSV file includes a column of the stock name. User **must** specify the column name when dumping the data. Here is an example:
 
@@ -184,7 +184,14 @@ After conversion, users can find their Qlib format data in the directory `~/.qli
     - `volume`
         The adjusted trading volume
     - `factor`
-        The Restoration factor. Normally, ``factor = adjusted_price / original_price``, `adjusted price` reference: `split adjusted <https://www.investopedia.com/terms/s/splitadjusted.asp>`_
+        The Restoration factor. Normally, ``factor = adjusted_price / original_price``, `adjusted price` reference: `split adjusted <https://www.investopedia.com/terms/s/splitadjusted.asp>`_ N.B. Yahoo's adjusted close prices adjust for both split and dividend events. In general, both split and dividend events should be accounted. See <https://www.crsp.org/products/documentation/crsp-calculations>.
+        Note that the Qlib data crawler adjusts the earliest available close value for any given instrument to be 1. It is equivalent to setting the first available date as the reference data and is often referred to as ``forward-adjusted price``. By doing this, when new data are obtained, existing data will not be needed to be adjusted, only new data will need to be adjusted (based on split/div event in new data and most recent data in database). 
+        The original price can be recovered by ``original_price = adjusted_price / factor``.
+        Most of time the stock data are adjusted using the latest date as a reference, i.e.``backward-adjusted``, so that when you investigate the data, the most recent data will generally be same as traded data. This can be obtained by ``backward_adjusted_price = adjusted_price/original_price[0]``, where ``adjusted_price`` is the forward-adjusted price. 
+        To maintain consistency between the data crawled by Qlib (i.e., those obtained from YahooCollector), we recommend you adjust your earlist close price to be 1 when you dump your data to csv, in particular, if your dump data do not completely overwrite qlib data.  
+        This can be done by     
+            - calculate your restoration factor (F) by ``F = adjusted_close_price/original_close_price``, then further divide your existing adjustment factor by earlist adjusted close price (``F = F/adjClose[0]``), and 
+            - apply the factor series (F) to unadjusted OHLCV data, i.e., multiply OHLC by F, and divide V by F, and adjust other columns if necessary.
 
     In the convention of `Qlib` data processing, `open, close, high, low, volume, money and factor` will be set to NaN if the stock is suspended. 
     If you want to use your own alpha-factor which can't be calculate by OCHLV, like PE, EPS and so on, you could add it to the CSV files with OHCLV together and then dump it to the Qlib format data.
